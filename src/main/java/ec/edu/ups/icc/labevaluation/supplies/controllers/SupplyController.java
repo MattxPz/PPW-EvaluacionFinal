@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ec.edu.ups.icc.labevaluation.supplies.dtos.CreateSupplyDto;
 import ec.edu.ups.icc.labevaluation.supplies.dtos.SupplyResponseDto;
+import ec.edu.ups.icc.labevaluation.supplies.dtos.UpdateSupplyQuantityDto;
 import ec.edu.ups.icc.labevaluation.supplies.services.SupplyService;
 import jakarta.validation.Valid;
 
@@ -12,7 +13,7 @@ import jakarta.validation.Valid;
 public class SupplyController {
 
     private final SupplyService service;
-
+    
     public SupplyController(SupplyService service){
         this.service=service;
     }
@@ -30,5 +31,9 @@ public class SupplyController {
         return service.findLowStock(maxQuantity);
     }
 
-    
+    @PatchMapping("/{id}/quantity")
+    @PreAuthorize("hasAnyRole('ADMIN','COORDINATOR')")
+    public SupplyResponseDto updateQuantity(@PathVariable Long id, @Valid @RequestBody UpdateSupplyQuantityDto dto){
+        return service.updateQuantity(id, dto);
+    }
 }
