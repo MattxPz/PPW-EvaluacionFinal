@@ -2,6 +2,7 @@ package ec.edu.ups.icc.labevaluation.supplies.services;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ec.edu.ups.icc.labevaluation.core.exceptions.domain.NotFoundException;
 import ec.edu.ups.icc.labevaluation.supplies.dtos.CreateSupplyDto;
 import ec.edu.ups.icc.labevaluation.supplies.dtos.SupplyResponseDto;
 import ec.edu.ups.icc.labevaluation.supplies.dtos.UpdateSupplyQuantityDto;
@@ -51,11 +52,6 @@ public class SupplyServiceImpl implements SupplyService {
         return SupplyMapper.toResponse(repository.save(entity));
     }
 
-    private SupplyEntity findActiveOrThrow(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findActiveOrThrow'");
-    }
-
     @Override
     @Transactional
     public void delete(Long id) {
@@ -70,4 +66,8 @@ public class SupplyServiceImpl implements SupplyService {
         repository.save(entity);
     }
 
+    private SupplyEntity findActiveOrThrow(Long id) {
+        return repository.findByIdAndDeletedFalse(id)
+            .orElseThrow(() -> new NotFoundException("SUPPLY_NOT_FOUND", "Supply not found"));
+    }
 }
