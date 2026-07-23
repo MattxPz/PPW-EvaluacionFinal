@@ -1,0 +1,73 @@
+package ec.edu.ups.icc.labevaluation.supplies.services;
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ec.edu.ups.icc.labevaluation.supplies.dtos.CreateSupplyDto;
+import ec.edu.ups.icc.labevaluation.supplies.dtos.SupplyResponseDto;
+import ec.edu.ups.icc.labevaluation.supplies.dtos.UpdateSupplyQuantityDto;
+import ec.edu.ups.icc.labevaluation.supplies.entities.SupplyEntity;
+import ec.edu.ups.icc.labevaluation.supplies.exceptions.SupplyConflictException;
+import ec.edu.ups.icc.labevaluation.supplies.mappers.SupplyMapper;
+import ec.edu.ups.icc.labevaluation.supplies.repositories.SupplyRepository;
+
+@Service
+public class SupplyServiceImpl implements SupplyService {
+    private final SupplyRepository repository;
+
+    public SupplyServiceImpl(SupplyRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    @Transactional
+    public SupplyResponseDto create(CreateSupplyDto dto) {
+        if (repository.existsByNameIgnoreCaseAndDeletedFalse(dto.name())) {
+            throw new SupplyConflictException("Supply name already created");
+        }
+
+        SupplyEntity entity = new SupplyEntity();
+        entity.setName(dto.name());
+        entity.setDescription(dto.description());
+        entity.setQuantity(dto.quantity());
+        entity.setMinimumStock(dto.minimumStock());
+        entity.setUnitPrice(dto.unitPrice());
+        entity.setActive(true);
+
+        return SupplyMapper.toResponse(repository.save(entity));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SupplyResponseDto> findLowStock(Integer maxQuantity) {
+        return repository.findByActiveTrueAndDeletedFalseAndQuantityLessThanOrderByQuantityAsc(maxQuantity)
+            .stream().map(SupplyMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public SupplyResponseDto updateQuantity(Long id, UpdateSupplyQuantityDto dto) {
+        SupplyEntity entity = findActiveOrThrow(id);
+        entity.setQuantity(dto.quantity());
+        return SupplyMapper.toResponse(repository.save(entity));
+    }
+
+    private SupplyEntity findActiveOrThrow(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findActiveOrThrow'");
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        SupplyEntity entity = findActiveOrThrow(id);
+
+        if (entity.getQuantity() != 0) {
+            throw new SupplyConflictException("Supply cannot be deleted because quantity is more than zero");
+        }
+
+        entity.setDeleted(true);
+        entity.setActive(false);
+        repository.save(entity);
+    }
+
+}
