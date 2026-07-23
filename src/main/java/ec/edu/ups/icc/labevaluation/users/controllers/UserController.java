@@ -6,8 +6,13 @@ import ec.edu.ups.icc.labevaluation.users.dtos.UserResponseDto;
 import ec.edu.ups.icc.labevaluation.users.services.UserService;
 @RestController @RequestMapping("/users")
 public class UserController {
+
     private final UserService service;
-    public UserController(UserService service){this.service=service;}
+
+    public UserController(UserService service){
+        this.service=service;
+    }
+    
     @GetMapping("/eligible") @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponseDto> findEligible(){return service.findEligible();}
 }
