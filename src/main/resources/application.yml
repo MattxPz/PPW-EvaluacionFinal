@@ -1,10 +1,7 @@
 server:
-  port: 8080
+  port: 8091
   servlet:
     context-path: /api
-  error:
-    include-stacktrace: never
-
 spring:
   application:
     name: ppw-lab-evaluation
@@ -29,6 +26,9 @@ spring:
       mode: always
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
+  web:
+    error:
+      include-stacktrace: never
 
 management:
   endpoints:
@@ -41,7 +41,7 @@ management:
 
 jwt:
   secret: ${JWT_SECRET:LabEvaluationSecretKeyForHS256MustHaveAtLeastThirtyTwoBytes2026}
-  expiration: 1800000
+  expiration: 900000
   refresh-expiration: 604800000
   issuer: ppw-lab-evaluation-api
   header: Authorization
