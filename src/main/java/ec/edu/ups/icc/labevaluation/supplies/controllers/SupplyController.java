@@ -36,4 +36,11 @@ public class SupplyController {
     public SupplyResponseDto updateQuantity(@PathVariable Long id, @Valid @RequestBody UpdateSupplyQuantityDto dto){
         return service.updateQuantity(id, dto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADMIN','COORDINATOR')")
+    public void delete(@PathVariable Long id){
+        service.delete(id);
+    }
 }
