@@ -1,2 +1,5 @@
 package ec.edu.ups.icc.labevaluation.users.dtos;
-public record UserResponseDto(Long id, String name, String email) {}
+
+import java.util.Set;
+
+public record UserResponseDto(Long id, String fullName, String email, Integer age, boolean active, Set<String> roles) {}
